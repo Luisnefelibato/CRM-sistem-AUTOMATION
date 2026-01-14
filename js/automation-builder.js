@@ -30,6 +30,9 @@ class AutomationBuilder {
         // Initialize persistence manager
         this.persistence = new PersistenceManager(this);
         
+        // Initialize execution engine
+        this.executionEngine = new ExecutionEngine(this);
+        
         // Initialize the builder
         this.init();
     }
@@ -1338,36 +1341,72 @@ class AutomationBuilder {
         console.log('🧹 Lienzo limpiado completamente');
     }
 
-    runFlow() {
+    async runFlow() {
         if (this.nodes.size === 0) {
             this.showToast('Añade nodos para ejecutar el flujo', 'warning');
             return;
         }
         
-        // Simulate flow execution
+        // Update status
         this.flowStatusEl.textContent = 'Ejecutando';
-        this.showToast('Ejecutando flujo de automatización...', 'info');
+        this.showToast('Ejecutando flujo con datos reales...', 'info');
         
-        // Add visual execution effects
-        this.canvas.querySelectorAll('.flow-node').forEach((node, index) => {
-            setTimeout(() => {
-                node.style.boxShadow = '0 0 20px var(--nexus-purple)';
-                setTimeout(() => {
-                    node.style.boxShadow = '';
-                }, 1000);
-            }, index * 500);
-        });
-        
-        // Simulate completion
-        setTimeout(() => {
+        try {
+            // Execute workflow with real data flow
+            const result = await this.executionEngine.executeWorkflow();
+            
+            // Show execution logs
+            console.log('📊 Execution Result:', result);
+            
+            // Update status
             this.flowStatusEl.textContent = 'Completado';
-            this.showToast('¡Flujo ejecutado exitosamente! ✨', 'success');
+            this.showToast(`¡Flujo ejecutado exitosamente! ${result.logs.length} eventos registrados`, 'success');
+            
+            // Show execution details modal (optional)
+            this.showExecutionResult(result);
+            
+            // Reset status after delay
+            setTimeout(() => {
+                this.flowStatusEl.textContent = 'Listo';
+            }, 3000);
+            
+        } catch (error) {
+            console.error('❌ Execution error:', error);
+            this.flowStatusEl.textContent = 'Error';
+            this.showToast(`Error en ejecución: ${error.message}`, 'error');
             
             setTimeout(() => {
-                this.flowStatusEl.textContent = 'Diseño';
+                this.flowStatusEl.textContent = 'Listo';
             }, 3000);
-        }, this.nodes.size * 500 + 1000);
+        }
     }
+
+    /**
+     * Show execution result in console and optionally in UI
+     * @param {Object} result - Execution result
+     */
+    showExecutionResult(result) {
+        console.group('📊 Workflow Execution Result');
+        console.log('Execution ID:', result.executionId);
+        console.log('Success:', result.success);
+        console.log('Nodes Executed:', Object.keys(result.context).length);
+        console.log('\n📋 Execution Context (Node Outputs):');
+        Object.entries(result.context).forEach(([nodeId, data]) => {
+            console.log(`\n  ${nodeId}:`, data);
+        });
+        console.log('\n📝 Execution Logs:');
+        result.logs.forEach(log => {
+            const emoji = {
+                info: 'ℹ️',
+                success: '✅',
+                warning: '⚠️',
+                error: '❌'
+            }[log.level] || '📝';
+            console.log(`  ${emoji} [${log.timestamp}] ${log.message}`);
+        });
+        console.groupEnd();
+    }
+
 
     updateStats() {
         this.nodeCountEl.textContent = this.nodes.size;

@@ -118,7 +118,7 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 - Google Sheets - Hojas cálculo
 - CRM - Gestión clientes
 
-## ✅ Funcionalidades de Persistencia (NUEVO)
+### ✅ Funcionalidades de Persistencia
 
 ### 💾 Guardado y Carga
 - **Guardar workflows**: Persistencia completa en localStorage
@@ -137,13 +137,26 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 📚 **Documentación completa**: Ver `EXPORT_IMPORT_GUIDE.md`  
 📁 **Ejemplos**: Ver carpeta `examples/`
 
+### ⚙️ Sistema de Ejecución (NUEVO)
+
+- **Flujo de datos real**: Los nodos pasan datos entre sí
+- **Topological sort**: Ejecución en orden correcto respetando dependencias
+- **Contexto compartido**: Outputs de nodos disponibles para nodos siguientes
+- **Detección de ciclos**: Previene workflows con ciclos infinitos
+- **Estados visuales**: Nodos muestran estado (ejecutando/éxito/error)
+- **Logs estructurados**: Registro completo de ejecución en console
+- **Manejo de errores**: Try/catch y feedback visual de errores
+
+📚 **Documentación completa**: Ver `EXECUTION_ENGINE_GUIDE.md`
+
 ## 🚧 Funcionalidades Pendientes
 
 ### Próximas Características
-- **Ejecución real**: Motor de workflows funcional
-- **Sistema de variables**: `{{node.output.field}}`
+- **Integraciones reales**: Conectar con APIs externas (OpenAI, Slack, etc.)
+- **Sistema de variables**: `{{node.output.field}}` para datos dinámicos
 - **Validación avanzada**: Análisis de errores y campos requeridos
-- **Logs de ejecución**: Historial y debugging completo
+- **Condicionales IF/ELSE**: Rutas alternativas en workflows
+- **Loops**: Iteración sobre arrays de datos
 - **Autenticación**: Login de usuarios
 - **Colaboración**: Edición compartida en tiempo real
 - **Versionado**: Control de cambios y rollback
