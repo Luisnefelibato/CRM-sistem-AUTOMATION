@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI - Demo Constructor de Automatizaciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Floating Elements Background -->
+    <div class="floating-elements">
+        <div class="floating-particle"></div>
+        <div class="floating-particle"></div>
+        <div class="floating-particle"></div>
+        <div class="floating-particle"></div>
+        <div class="floating-particle"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header-enhanced">
+        <div class="container">
+            <nav class="nav-content">
+                <div class="logo-section">
+                    <div class="logo-container">
+                        <div class="nexus-logo">
+                            <div class="logo-gradient"></div>
+                            <span class="logo-text">N</span>
+                        </div>
+                        <div class="brand-info">
+                            <h1>Nexus AI</h1>
+                            <p>Constructor de Automatizaciones</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="demo-button" id="loadExampleFlow">
+                        <i class="fas fa-magic"></i>
+                        Ver Ejemplo
+                    </button>
+                    <button class="demo-button secondary" id="clearCanvas">
+                        <i class="fas fa-trash"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Toolbar -->
+        <div class="toolbar glass-effect">
+            <div class="toolbar-section">
+                <h3><i class="fas fa-sign-in-alt"></i> Entrada</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="webhook" draggable="true">
+                        <div class="node-icon"><i class="fas fa-globe"></i></div>
+                        <span>Webhook</span>
+                    </div>
+                    <div class="node-template" data-type="form" draggable="true">
+                        <div class="node-icon"><i class="fas fa-wpforms"></i></div>
+                        <span>Formulario</span>
+                    </div>
+                    <div class="node-template" data-type="email-trigger" draggable="true">
+                        <div class="node-icon"><i class="fas fa-envelope"></i></div>
+                        <span>Email</span>
+                    </div>
+                    <div class="node-template" data-type="schedule" draggable="true">
+                        <div class="node-icon"><i class="fas fa-clock"></i></div>
+                        <span>Programador</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3><i class="fas fa-cogs"></i> Procesamiento</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="chatgpt" draggable="true">
+                        <div class="node-icon"><i class="fas fa-robot"></i></div>
+                        <span>ChatGPT</span>
+                    </div>
+                    <div class="node-template" data-type="gemini" draggable="true">
+                        <div class="node-icon"><i class="fas fa-brain"></i></div>
+                        <span>Gemini AI</span>
+                    </div>
+                    <div class="node-template" data-type="filter" draggable="true">
+                        <div class="node-icon"><i class="fas fa-filter"></i></div>
+                        <span>Filtro</span>
+                    </div>
+                    <div class="node-template" data-type="transform" draggable="true">
+                        <div class="node-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <span>Transformar</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3><i class="fas fa-sign-out-alt"></i> Salida</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="email-send" draggable="true">
+                        <div class="node-icon"><i class="fas fa-paper-plane"></i></div>
+                        <span>Enviar Email</span>
+                    </div>
+                    <div class="node-template" data-type="slack" draggable="true">
+                        <div class="node-icon"><i class="fab fa-slack"></i></div>
+                        <span>Slack</span>
+                    </div>
+                    <div class="node-template" data-type="database" draggable="true">
+                        <div class="node-icon"><i class="fas fa-database"></i></div>
+                        <span>Base Datos</span>
+                    </div>
+                    <div class="node-template" data-type="api-call" draggable="true">
+                        <div class="node-icon"><i class="fas fa-code"></i></div>
+                        <span>API Call</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3><i class="fas fa-link"></i> Integraciones</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="zapier" draggable="true">
+                        <div class="node-icon"><i class="fas fa-bolt"></i></div>
+                        <span>Zapier</span>
+                    </div>
+                    <div class="node-template" data-type="make" draggable="true">
+                        <div class="node-icon"><i class="fas fa-puzzle-piece"></i></div>
+                        <span>Make</span>
+                    </div>
+                    <div class="node-template" data-type="google-sheets" draggable="true">
+                        <div class="node-icon"><i class="fab fa-google"></i></div>
+                        <span>G. Sheets</span>
+                    </div>
+                    <div class="node-template" data-type="crm" draggable="true">
+                        <div class="node-icon"><i class="fas fa-users"></i></div>
+                        <span>CRM</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3><i class="fas fa-comments"></i> Comunicación</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="whatsapp" draggable="true">
+                        <div class="node-icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+                        <span>WhatsApp</span>
+                    </div>
+                    <div class="node-template" data-type="telegram" draggable="true">
+                        <div class="node-icon telegram"><i class="fab fa-telegram"></i></div>
+                        <span>Telegram</span>
+                    </div>
+                    <div class="node-template" data-type="twilio" draggable="true">
+                        <div class="node-icon twilio"><i class="fas fa-sms"></i></div>
+                        <span>Twilio SMS</span>
+                    </div>
+                    <div class="node-template" data-type="discord" draggable="true">
+                        <div class="node-icon discord"><i class="fab fa-discord"></i></div>
+                        <span>Discord</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3><i class="fas fa-credit-card"></i> Pagos</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="stripe" draggable="true">
+                        <div class="node-icon stripe"><i class="fab fa-stripe-s"></i></div>
+                        <span>Stripe</span>
+                    </div>
+                    <div class="node-template" data-type="paypal" draggable="true">
+                        <div class="node-icon paypal"><i class="fab fa-paypal"></i></div>
+                        <span>PayPal</span>
+                    </div>
+                    <div class="node-template" data-type="mercadopago" draggable="true">
+                        <div class="node-icon mercadopago"><i class="fas fa-money-bill-wave"></i></div>
+                        <span>MercadoPago</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3><i class="fas fa-cloud"></i> Cloud & Storage</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="aws-s3" draggable="true">
+                        <div class="node-icon aws"><i class="fab fa-aws"></i></div>
+                        <span>AWS S3</span>
+                    </div>
+                    <div class="node-template" data-type="firebase" draggable="true">
+                        <div class="node-icon firebase"><i class="fas fa-fire"></i></div>
+                        <span>Firebase</span>
+                    </div>
+                    <div class="node-template" data-type="mongodb" draggable="true">
+                        <div class="node-icon mongodb"><i class="fas fa-leaf"></i></div>
+                        <span>MongoDB</span>
+                    </div>
+                    <div class="node-template" data-type="supabase" draggable="true">
+                        <div class="node-icon supabase"><i class="fas fa-bolt"></i></div>
+                        <span>Supabase</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3><i class="fas fa-chart-bar"></i> Analytics</h3>
+                <div class="nodes-grid">
+                    <div class="node-template" data-type="google-analytics" draggable="true">
+                        <div class="node-icon ga"><i class="fas fa-chart-line"></i></div>
+                        <span>G. Analytics</span>
+                    </div>
+                    <div class="node-template" data-type="mixpanel" draggable="true">
+                        <div class="node-icon mixpanel"><i class="fas fa-chart-pie"></i></div>
+                        <span>Mixpanel</span>
+                    </div>
+                    <div class="node-template" data-type="segment" draggable="true">
+                        <div class="node-icon segment"><i class="fas fa-project-diagram"></i></div>
+                        <span>Segment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="canvas-container">
+            <div class="canvas-header">
+                <div class="canvas-info">
+                    <h2><i class="fas fa-project-diagram"></i> Flujo de Automatización</h2>
+                    <p>Arrastra y conecta nodos para crear tu automatización</p>
+                </div>
+                <div class="canvas-controls">
+                    <button class="control-btn" id="zoomIn">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="control-btn" id="zoomOut">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="control-btn" id="fitToScreen">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </button>
+                    <button class="run-button" id="runFlow">
+                        <i class="fas fa-play"></i>
+                        Ejecutar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="canvas" id="flowCanvas">
+                <svg class="connections-svg" id="connectionsSvg"></svg>
+                <div class="canvas-grid"></div>
+                <div class="drop-zone-hint">
+                    <i class="fas fa-mouse-pointer"></i>
+                    <h3>Arrastra nodos aquí para empezar</h3>
+                    <p>Conecta diferentes servicios y crea automatizaciones poderosas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Properties Panel -->
+        <div class="properties-panel glass-effect" id="propertiesPanel">
+            <div class="panel-header">
+                <h3><i class="fas fa-cog"></i> Propiedades</h3>
+                <button class="close-panel" id="closePanel">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="panel-content">
+                <div class="empty-state">
+                    <i class="fas fa-mouse-pointer"></i>
+                    <p>Selecciona un nodo para ver sus propiedades</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flow Info Panel -->
+        <div class="flow-info glass-effect">
+            <div class="info-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Nodos:</span>
+                    <span class="stat-value" id="nodeCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Conexiones:</span>
+                    <span class="stat-value" id="connectionCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Estado:</span>
+                    <span class="stat-value status" id="flowStatus">Diseño</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Example Flows Modal -->
+    <div class="modal-overlay" id="exampleModal">
+        <div class="modal glass-effect">
+            <div class="modal-header">
+                <h3><i class="fas fa-magic"></i> Flujos de Ejemplo</h3>
+                <button class="close-modal" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="example-flows">
+                    <div class="example-card" data-example="lead-qualification">
+                        <div class="example-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h4>Calificación de Leads</h4>
+                        <p>Formulario → IA → CRM automático</p>
+                    </div>
+                    <div class="example-card" data-example="customer-support">
+                        <div class="example-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h4>Soporte al Cliente</h4>
+                        <p>Email → ChatGPT → Respuesta automática</p>
+                    </div>
+                    <div class="example-card" data-example="content-generation">
+                        <div class="example-icon">
+                            <i class="fas fa-pen-fancy"></i>
+                        </div>
+                        <h4>Generación de Contenido</h4>
+                        <p>Programador → IA → Redes sociales</p>
+                    </div>
+                    <div class="example-card" data-example="data-analysis">
+                        <div class="example-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Análisis de Datos</h4>
+                        <p>Webhook → Filtros → Dashboard</p>
+                    </div>
+                    <div class="example-card" data-example="whatsapp-bot">
+                        <div class="example-icon whatsapp-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <h4>Bot WhatsApp con IA</h4>
+                        <p>Webhook → ChatGPT → WhatsApp</p>
+                    </div>
+                    <div class="example-card" data-example="ecommerce-notifications">
+                        <div class="example-icon stripe-icon">
+                            <i class="fab fa-stripe-s"></i>
+                        </div>
+                        <h4>Notificaciones E-commerce</h4>
+                        <p>Stripe → Email + WhatsApp + Slack</p>
+                    </div>
+                    <div class="example-card" data-example="data-pipeline">
+                        <div class="example-icon firebase-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <h4>Pipeline de Datos</h4>
+                        <p>Form → Firebase + MongoDB + Analytics</p>
+                    </div>
+                    <div class="example-card" data-example="telegram-alerts">
+                        <div class="example-icon telegram-icon">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <h4>Alertas de Monitoreo</h4>
+                        <p>Schedule → API → Telegram + Discord</p>
+                    </div>
+                    <div class="example-card" data-example="payment-flow">
+                        <div class="example-icon payment-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h4>Flujo de Pagos Multi-región</h4>
+                        <p>Stripe + PayPal + MercadoPago → DB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/automation-builder.js"></script>
+</body>
+</html>
