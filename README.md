@@ -14,11 +14,26 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 ### 🔧 Constructor de Flujos
 - **Drag & Drop**: Arrastra nodos desde la toolbar al canvas
 - **Conexiones visuales**: Conecta nodos con curvas SVG suavizadas
-- **4 Categorías de nodos**:
+- **Buscador de nodos**: Encuentra nodos rápidamente con búsqueda fuzzy y shortcut `⌘K`
+- **8 Categorías de nodos** (30+ tipos):
   - **Entrada**: Webhook, Formulario, Email, Programador
   - **Procesamiento**: ChatGPT, Gemini AI, Filtros, Transformadores
   - **Salida**: Email, Slack, Base de datos, API calls
   - **Integraciones**: Zapier, Make, Google Sheets, CRM
+  - **Comunicación**: WhatsApp, Telegram, Twilio, Discord
+  - **Pagos**: Stripe, PayPal, MercadoPago
+  - **Cloud & Storage**: AWS S3, Firebase, MongoDB, Supabase
+  - **Analytics**: Google Analytics, Mixpanel, Segment
+
+### 🔍 Buscador de Nodos (NUEVO)
+- **Búsqueda en tiempo real**: Encuentra nodos al instante
+- **Búsqueda fuzzy**: Encuentra incluso con typos ("sla" → Slack)
+- **Shortcut**: `⌘K` (Mac) / `Ctrl+K` (Windows) para activar
+- **Highlight inteligente**: Resalta coincidencias en nombres
+- **Contador de resultados**: Muestra "X de Y nodos encontrados"
+- **ESC para limpiar**: Borra búsqueda rápidamente
+
+📚 **Documentación completa**: Ver `NODE_SEARCH_GUIDE.md`
 
 ### 🎛️ Panel de Propiedades
 - **Configuración dinámica**: Cada nodo tiene propiedades editables
@@ -103,17 +118,35 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 - Google Sheets - Hojas cálculo
 - CRM - Gestión clientes
 
-## 🚧 Funcionalidades No Implementadas
+## ✅ Funcionalidades de Persistencia (NUEVO)
+
+### 💾 Guardado y Carga
+- **Guardar workflows**: Persistencia completa en localStorage
+- **Cargar workflows**: Lista visual con metadata (nodos, conexiones, fecha)
+- **Auto-guardado**: Cada 30 segundos automáticamente
+- **Múltiples workflows**: Gestiona varios proyectos simultáneamente
+- **Shortcut**: `Ctrl+S` para guardar rápidamente
+
+### 📤📥 Exportación e Importación
+- **Exportar a JSON**: Descarga workflows completos
+- **Importar desde JSON**: Carga workflows desde archivos
+- **Workflows de ejemplo**: 2 ejemplos listos para importar
+- **Validación automática**: Verifica estructura al importar
+- **Portabilidad**: Comparte workflows entre usuarios
+
+📚 **Documentación completa**: Ver `EXPORT_IMPORT_GUIDE.md`  
+📁 **Ejemplos**: Ver carpeta `examples/`
+
+## 🚧 Funcionalidades Pendientes
 
 ### Próximas Características
-- **Guardado de flujos**: Persistencia en localStorage/backend
-- **Exportación**: JSON, imagen, código
-- **Plantillas avanzadas**: Más ejemplos predefinidos
-- **Validación de flujos**: Análisis de errores
-- **Logs de ejecución**: Historial y debugging
+- **Ejecución real**: Motor de workflows funcional
+- **Sistema de variables**: `{{node.output.field}}`
+- **Validación avanzada**: Análisis de errores y campos requeridos
+- **Logs de ejecución**: Historial y debugging completo
 - **Autenticación**: Login de usuarios
-- **Colaboración**: Edición compartida
-- **Versionado**: Control de cambios
+- **Colaboración**: Edición compartida en tiempo real
+- **Versionado**: Control de cambios y rollback
 
 ### Integraciones Pendientes
 - **Más APIs**: WhatsApp, Telegram, Discord

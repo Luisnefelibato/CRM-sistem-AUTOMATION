@@ -1,0 +1,254 @@
+{
+  "id": "workflow_example_ecommerce_notifications",
+  "name": "Sistema de Notificaciones E-commerce",
+  "version": "1.0",
+  "createdAt": "2026-01-14T10:30:00.000Z",
+  "updatedAt": "2026-01-14T16:30:00.000Z",
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "stripe",
+      "position": {
+        "x": 50,
+        "y": 200
+      },
+      "properties": {
+        "event": "payment_intent.succeeded",
+        "webhookSecret": "{{env.STRIPE_WEBHOOK_SECRET}}",
+        "apiKey": "{{env.STRIPE_API_KEY}}"
+      },
+      "config": {
+        "subtitle": "Stripe Payment",
+        "category": "integration",
+        "hasInput": false,
+        "hasOutput": true,
+        "color": "#635BFF"
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "transform",
+      "position": {
+        "x": 300,
+        "y": 200
+      },
+      "properties": {
+        "mappings": {
+          "orderId": "{{payment.metadata.order_id}}",
+          "customerEmail": "{{payment.receipt_email}}",
+          "customerPhone": "{{payment.metadata.phone}}",
+          "amount": "{{payment.amount / 100}}",
+          "currency": "{{payment.currency}}",
+          "customerName": "{{payment.billing_details.name}}",
+          "products": "{{payment.metadata.products}}"
+        },
+        "format": "json"
+      },
+      "config": {
+        "subtitle": "Transforma datos",
+        "category": "processing",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#8b5cf6"
+      }
+    },
+    {
+      "id": "node_3",
+      "type": "firebase",
+      "position": {
+        "x": 550,
+        "y": 100
+      },
+      "properties": {
+        "collection": "orders",
+        "operation": "add",
+        "projectId": "{{env.FIREBASE_PROJECT_ID}}",
+        "credentials": "{{env.FIREBASE_CREDENTIALS}}"
+      },
+      "config": {
+        "subtitle": "Firebase Firestore",
+        "category": "integration",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#FFA000"
+      }
+    },
+    {
+      "id": "node_4",
+      "type": "email-send",
+      "position": {
+        "x": 550,
+        "y": 200
+      },
+      "properties": {
+        "provider": "SendGrid",
+        "to": "{{order.customerEmail}}",
+        "subject": "✅ Confirmación de Pedido #{{order.orderId}}",
+        "template": "order_confirmation",
+        "dynamicData": {
+          "customerName": "{{order.customerName}}",
+          "orderId": "{{order.orderId}}",
+          "amount": "{{order.amount}}",
+          "currency": "{{order.currency}}",
+          "products": "{{order.products}}"
+        }
+      },
+      "config": {
+        "subtitle": "Envía emails",
+        "category": "output",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#ef4444"
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "whatsapp",
+      "position": {
+        "x": 550,
+        "y": 300
+      },
+      "properties": {
+        "provider": "Meta Cloud API",
+        "phoneNumberId": "{{env.WHATSAPP_PHONE_ID}}",
+        "accessToken": "{{env.WHATSAPP_ACCESS_TOKEN}}",
+        "messageType": "template",
+        "templateName": "order_confirmation",
+        "recipientPhone": "{{order.customerPhone}}",
+        "templateParams": [
+          "{{order.customerName}}",
+          "{{order.orderId}}",
+          "${{order.amount}}"
+        ]
+      },
+      "config": {
+        "subtitle": "WhatsApp Business API",
+        "category": "communication",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#25D366"
+      }
+    },
+    {
+      "id": "node_6",
+      "type": "slack",
+      "position": {
+        "x": 800,
+        "y": 150
+      },
+      "properties": {
+        "channel": "#ventas-notificaciones",
+        "username": "E-commerce Bot",
+        "icon": ":shopping_cart:",
+        "message": "🛒 Nueva Venta Realizada\n\n💰 Monto: ${{order.amount}} {{order.currency}}\n👤 Cliente: {{order.customerName}}\n📧 Email: {{order.customerEmail}}\n🆔 Orden: #{{order.orderId}}"
+      },
+      "config": {
+        "subtitle": "Mensaje Slack",
+        "category": "output",
+        "hasInput": true,
+        "hasOutput": false,
+        "color": "#4ade80"
+      }
+    },
+    {
+      "id": "node_7",
+      "type": "google-sheets",
+      "position": {
+        "x": 800,
+        "y": 300
+      },
+      "properties": {
+        "spreadsheetId": "{{env.GSHEETS_SALES_ID}}",
+        "sheetName": "Ventas 2026",
+        "operation": "append",
+        "credentials": "{{env.GOOGLE_CREDENTIALS}}",
+        "values": [
+          "{{order.orderId}}",
+          "{{order.customerName}}",
+          "{{order.customerEmail}}",
+          "{{order.amount}}",
+          "{{order.currency}}",
+          "{{timestamp}}"
+        ]
+      },
+      "config": {
+        "subtitle": "Google Sheets",
+        "category": "integration",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#22c55e"
+      }
+    },
+    {
+      "id": "node_8",
+      "type": "google-analytics",
+      "position": {
+        "x": 1050,
+        "y": 250
+      },
+      "properties": {
+        "measurementId": "{{env.GA_MEASUREMENT_ID}}",
+        "apiSecret": "{{env.GA_API_SECRET}}",
+        "eventName": "purchase",
+        "eventParams": {
+          "transaction_id": "{{order.orderId}}",
+          "value": "{{order.amount}}",
+          "currency": "{{order.currency}}",
+          "items": "{{order.products}}"
+        }
+      },
+      "config": {
+        "subtitle": "Google Analytics",
+        "category": "integration",
+        "hasInput": true,
+        "hasOutput": false,
+        "color": "#4285F4"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_1",
+      "from": "node_1",
+      "to": "node_2"
+    },
+    {
+      "id": "conn_2",
+      "from": "node_2",
+      "to": "node_3"
+    },
+    {
+      "id": "conn_3",
+      "from": "node_2",
+      "to": "node_4"
+    },
+    {
+      "id": "conn_4",
+      "from": "node_2",
+      "to": "node_5"
+    },
+    {
+      "id": "conn_5",
+      "from": "node_4",
+      "to": "node_6"
+    },
+    {
+      "id": "conn_6",
+      "from": "node_5",
+      "to": "node_7"
+    },
+    {
+      "id": "conn_7",
+      "from": "node_7",
+      "to": "node_8"
+    }
+  ],
+  "settings": {
+    "zoom": 0.85,
+    "pan": {
+      "x": -50,
+      "y": 0
+    },
+    "nodeIdCounter": 8
+  }
+}
