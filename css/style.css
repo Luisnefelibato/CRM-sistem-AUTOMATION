@@ -319,6 +319,189 @@ body {
     overflow-y: auto;
 }
 
+/* ==========================================
+   NODE SEARCH - Buscador de Nodos
+   ========================================== */
+
+.node-search-container {
+    margin-bottom: 24px;
+    position: sticky;
+    top: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    z-index: 10;
+}
+
+.node-search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+    font-size: 14px;
+    pointer-events: none;
+    transition: color var(--transition-smooth);
+}
+
+.node-search-input {
+    width: 100%;
+    padding: 12px 40px 12px 42px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: all var(--transition-smooth);
+    outline: none;
+}
+
+.node-search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.node-search-input:focus {
+    border-color: var(--nexus-purple);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(126, 58, 237, 0.1);
+}
+
+.node-search-input:focus + .search-shortcut {
+    opacity: 0;
+}
+
+.node-search-input:focus ~ .search-icon {
+    color: var(--nexus-purple);
+}
+
+.search-shortcut {
+    position: absolute;
+    right: 14px;
+    display: flex;
+    gap: 4px;
+    pointer-events: none;
+    transition: opacity var(--transition-smooth);
+}
+
+.search-shortcut kbd {
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'Inter', monospace;
+    color: var(--text-muted);
+    font-weight: 600;
+    min-width: 24px;
+    text-align: center;
+}
+
+.clear-search {
+    position: absolute;
+    right: 14px;
+    padding: 4px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.clear-search:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.search-stats {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(126, 58, 237, 0.1);
+    border: 1px solid rgba(126, 58, 237, 0.2);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.search-count::before {
+    content: '🔍';
+    font-size: 14px;
+}
+
+/* Nodos filtrados */
+.node-template.filtered-out {
+    display: none !important;
+}
+
+.node-template.search-highlight {
+    animation: searchPulse 0.5s ease;
+}
+
+@keyframes searchPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(126, 58, 237, 0.4);
+    }
+}
+
+/* Secciones vacías (todos los nodos filtrados) */
+.toolbar-section.section-empty {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.toolbar-section.section-empty h3 {
+    position: relative;
+}
+
+.toolbar-section.section-empty h3::after {
+    content: '(Sin resultados)';
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* Highlight en texto de búsqueda */
+.search-match {
+    background: rgba(126, 58, 237, 0.3);
+    color: var(--nexus-purple);
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+/* Estado activo del search */
+.node-search-container.searching {
+    border-color: var(--nexus-purple);
+    box-shadow: 0 0 0 4px rgba(126, 58, 237, 0.1);
+}
+
 .toolbar-section {
     margin-bottom: 32px;
 }

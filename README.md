@@ -14,11 +14,26 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 ### 🔧 Constructor de Flujos
 - **Drag & Drop**: Arrastra nodos desde la toolbar al canvas
 - **Conexiones visuales**: Conecta nodos con curvas SVG suavizadas
-- **4 Categorías de nodos**:
+- **Buscador de nodos**: Encuentra nodos rápidamente con búsqueda fuzzy y shortcut `⌘K`
+- **8 Categorías de nodos** (30+ tipos):
   - **Entrada**: Webhook, Formulario, Email, Programador
   - **Procesamiento**: ChatGPT, Gemini AI, Filtros, Transformadores
   - **Salida**: Email, Slack, Base de datos, API calls
   - **Integraciones**: Zapier, Make, Google Sheets, CRM
+  - **Comunicación**: WhatsApp, Telegram, Twilio, Discord
+  - **Pagos**: Stripe, PayPal, MercadoPago
+  - **Cloud & Storage**: AWS S3, Firebase, MongoDB, Supabase
+  - **Analytics**: Google Analytics, Mixpanel, Segment
+
+### 🔍 Buscador de Nodos (NUEVO)
+- **Búsqueda en tiempo real**: Encuentra nodos al instante
+- **Búsqueda fuzzy**: Encuentra incluso con typos ("sla" → Slack)
+- **Shortcut**: `⌘K` (Mac) / `Ctrl+K` (Windows) para activar
+- **Highlight inteligente**: Resalta coincidencias en nombres
+- **Contador de resultados**: Muestra "X de Y nodos encontrados"
+- **ESC para limpiar**: Borra búsqueda rápidamente
+
+📚 **Documentación completa**: Ver `NODE_SEARCH_GUIDE.md`
 
 ### 🎛️ Panel de Propiedades
 - **Configuración dinámica**: Cada nodo tiene propiedades editables

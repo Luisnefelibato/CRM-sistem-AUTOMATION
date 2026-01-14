@@ -40,6 +40,7 @@ class AutomationBuilder {
         this.setupDragAndDrop();
         this.setupCanvas();
         this.setupPersistenceUI();
+        this.setupNodeSearch();
         this.updateStats();
         
         // Start auto-save
@@ -1975,6 +1976,194 @@ class AutomationBuilder {
      */
     markAsChanged() {
         this.persistence.markAsChanged();
+    }
+
+    /**
+     * Setup Node Search functionality
+     */
+    setupNodeSearch() {
+        const searchInput = document.getElementById('nodeSearch');
+        const clearBtn = document.getElementById('clearSearch');
+        const searchStats = document.getElementById('searchStats');
+        const searchContainer = document.querySelector('.node-search-container');
+        
+        if (!searchInput) return;
+        
+        let searchTimeout = null;
+        
+        // Search input handler with debounce
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.filterNodes(e.target.value);
+            }, 200);
+        });
+        
+        // Clear search button
+        clearBtn?.addEventListener('click', () => {
+            searchInput.value = '';
+            this.filterNodes('');
+            searchInput.focus();
+        });
+        
+        // Keyboard shortcut: Cmd+K or Ctrl+K
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+            
+            // ESC to clear search
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                searchInput.value = '';
+                this.filterNodes('');
+                searchInput.blur();
+            }
+        });
+        
+        console.log('🔍 Node search initialized');
+    }
+
+    /**
+     * Filter nodes based on search query
+     * @param {string} query - Search query
+     */
+    filterNodes(query) {
+        const searchInput = document.getElementById('nodeSearch');
+        const clearBtn = document.getElementById('clearSearch');
+        const searchStats = document.getElementById('searchStats');
+        const searchContainer = document.querySelector('.node-search-container');
+        
+        const normalizedQuery = query.toLowerCase().trim();
+        const nodeTemplates = document.querySelectorAll('.node-template');
+        const toolbarSections = document.querySelectorAll('.toolbar-section');
+        
+        let visibleCount = 0;
+        let totalCount = nodeTemplates.length;
+        
+        // Show/hide clear button
+        if (normalizedQuery) {
+            clearBtn.style.display = 'flex';
+            searchContainer.classList.add('searching');
+        } else {
+            clearBtn.style.display = 'none';
+            searchContainer.classList.remove('searching');
+        }
+        
+        // If query is empty, show all nodes
+        if (!normalizedQuery) {
+            nodeTemplates.forEach(node => {
+                node.classList.remove('filtered-out', 'search-highlight');
+                node.querySelector('span').innerHTML = node.querySelector('span').textContent;
+            });
+            toolbarSections.forEach(section => section.classList.remove('section-empty'));
+            searchStats.style.display = 'none';
+            return;
+        }
+        
+        // Filter nodes
+        nodeTemplates.forEach(node => {
+            const nodeName = node.querySelector('span').textContent.toLowerCase();
+            const nodeType = node.dataset.type.toLowerCase();
+            
+            // Check if query matches name or type
+            const matches = this.fuzzyMatch(normalizedQuery, nodeName) || 
+                           nodeType.includes(normalizedQuery);
+            
+            if (matches) {
+                node.classList.remove('filtered-out');
+                node.classList.add('search-highlight');
+                visibleCount++;
+                
+                // Highlight matching text
+                this.highlightText(node.querySelector('span'), normalizedQuery);
+                
+                // Remove highlight animation after delay
+                setTimeout(() => {
+                    node.classList.remove('search-highlight');
+                }, 500);
+            } else {
+                node.classList.add('filtered-out');
+                node.classList.remove('search-highlight');
+            }
+        });
+        
+        // Update section visibility
+        toolbarSections.forEach(section => {
+            const visibleNodes = section.querySelectorAll('.node-template:not(.filtered-out)');
+            if (visibleNodes.length === 0) {
+                section.classList.add('section-empty');
+            } else {
+                section.classList.remove('section-empty');
+            }
+        });
+        
+        // Update search stats
+        searchStats.style.display = 'block';
+        searchStats.querySelector('.search-count').textContent = 
+            `${visibleCount} de ${totalCount} nodos encontrados`;
+        
+        console.log(`🔍 Search: "${query}" - ${visibleCount}/${totalCount} nodes found`);
+    }
+
+    /**
+     * Fuzzy match algorithm for flexible search
+     * @param {string} query - Search query
+     * @param {string} text - Text to match against
+     * @returns {boolean} - Whether query matches text
+     */
+    fuzzyMatch(query, text) {
+        if (!query) return true;
+        if (!text) return false;
+        
+        let queryIndex = 0;
+        let textIndex = 0;
+        
+        while (queryIndex < query.length && textIndex < text.length) {
+            if (query[queryIndex] === text[textIndex]) {
+                queryIndex++;
+            }
+            textIndex++;
+        }
+        
+        return queryIndex === query.length;
+    }
+
+    /**
+     * Highlight matching text in node name
+     * @param {HTMLElement} element - Element containing text
+     * @param {string} query - Search query
+     */
+    highlightText(element, query) {
+        const text = element.textContent;
+        const lowerText = text.toLowerCase();
+        const lowerQuery = query.toLowerCase();
+        
+        // Simple highlight: wrap matching substring
+        const index = lowerText.indexOf(lowerQuery);
+        if (index !== -1) {
+            const before = text.substring(0, index);
+            const match = text.substring(index, index + query.length);
+            const after = text.substring(index + query.length);
+            element.innerHTML = `${before}<span class="search-match">${match}</span>${after}`;
+        } else {
+            // Fuzzy highlight: highlight individual matching characters
+            let result = '';
+            let queryIndex = 0;
+            
+            for (let i = 0; i < text.length; i++) {
+                if (queryIndex < query.length && 
+                    text[i].toLowerCase() === query[queryIndex].toLowerCase()) {
+                    result += `<span class="search-match">${text[i]}</span>`;
+                    queryIndex++;
+                } else {
+                    result += text[i];
+                }
+            }
+            
+            element.innerHTML = result;
+        }
     }
 }
 

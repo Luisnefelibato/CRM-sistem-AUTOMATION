@@ -69,6 +69,29 @@
     <main class="main-container">
         <!-- Toolbar -->
         <div class="toolbar glass-effect">
+            <!-- Node Search -->
+            <div class="node-search-container">
+                <div class="node-search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="nodeSearch" 
+                        class="node-search-input" 
+                        placeholder="Buscar nodos..."
+                        autocomplete="off"
+                    >
+                    <div class="search-shortcut">
+                        <kbd>⌘</kbd><kbd>K</kbd>
+                    </div>
+                    <button class="clear-search" id="clearSearch" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="search-stats" id="searchStats" style="display: none;">
+                    <span class="search-count"></span>
+                </div>
+            </div>
+
             <div class="toolbar-section">
                 <h3><i class="fas fa-sign-in-alt"></i> Entrada</h3>
                 <div class="nodes-grid">
