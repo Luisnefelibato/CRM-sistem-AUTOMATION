@@ -1,0 +1,188 @@
+{
+  "id": "workflow_example_lead_qualification",
+  "name": "Calificación Automática de Leads",
+  "version": "1.0",
+  "createdAt": "2026-01-14T10:00:00.000Z",
+  "updatedAt": "2026-01-14T16:00:00.000Z",
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "form",
+      "position": {
+        "x": 50,
+        "y": 150
+      },
+      "properties": {
+        "formName": "Contacto de Venta",
+        "fields": [
+          "nombre",
+          "email",
+          "empresa",
+          "telefono",
+          "presupuesto"
+        ],
+        "validation": true
+      },
+      "config": {
+        "subtitle": "Captura formularios",
+        "category": "input",
+        "hasInput": false,
+        "hasOutput": true,
+        "color": "#06b6d4"
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "chatgpt",
+      "position": {
+        "x": 300,
+        "y": 150
+      },
+      "properties": {
+        "model": "gpt-4",
+        "temperature": 0.3,
+        "maxTokens": 500,
+        "systemPrompt": "Analiza el lead y califica entre 1-10 basado en: presupuesto, tamaño de empresa, urgencia. Devuelve JSON con 'score', 'categoria' (hot/warm/cold), 'razonamiento'."
+      },
+      "config": {
+        "subtitle": "Procesamiento IA",
+        "category": "processing",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#10b981"
+      }
+    },
+    {
+      "id": "node_3",
+      "type": "filter",
+      "position": {
+        "x": 550,
+        "y": 100
+      },
+      "properties": {
+        "conditions": [
+          {
+            "field": "score",
+            "operator": ">=",
+            "value": 8
+          }
+        ],
+        "operator": "AND",
+        "action": "continue"
+      },
+      "config": {
+        "subtitle": "Filtra datos",
+        "category": "processing",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#6366f1"
+      }
+    },
+    {
+      "id": "node_4",
+      "type": "slack",
+      "position": {
+        "x": 800,
+        "y": 100
+      },
+      "properties": {
+        "channel": "#ventas-hot-leads",
+        "username": "Lead Bot",
+        "icon": ":fire:",
+        "message": "🔥 LEAD HOT DETECTADO!\n\nNombre: {{lead.nombre}}\nEmpresa: {{lead.empresa}}\nScore: {{lead.score}}/10\n\n{{lead.razonamiento}}"
+      },
+      "config": {
+        "subtitle": "Mensaje Slack",
+        "category": "output",
+        "hasInput": true,
+        "hasOutput": false,
+        "color": "#4ade80"
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "crm",
+      "position": {
+        "x": 800,
+        "y": 250
+      },
+      "properties": {
+        "system": "HubSpot",
+        "action": "create_contact",
+        "pipeline": "sales",
+        "stage": "new_lead",
+        "assignTo": "auto",
+        "customFields": {
+          "lead_score": "{{lead.score}}",
+          "lead_category": "{{lead.categoria}}",
+          "lead_source": "website_form"
+        }
+      },
+      "config": {
+        "subtitle": "Sistema CRM",
+        "category": "integration",
+        "hasInput": true,
+        "hasOutput": true,
+        "color": "#6366f1"
+      }
+    },
+    {
+      "id": "node_6",
+      "type": "email-send",
+      "position": {
+        "x": 1050,
+        "y": 250
+      },
+      "properties": {
+        "provider": "SMTP",
+        "to": "{{lead.email}}",
+        "subject": "¡Gracias por tu interés!",
+        "template": "welcome_lead",
+        "bcc": false,
+        "body": "Hola {{lead.nombre}},\n\nGracias por contactarnos. Tu información ha sido recibida y nuestro equipo te contactará pronto.\n\nSaludos,\nEquipo de Ventas"
+      },
+      "config": {
+        "subtitle": "Envía emails",
+        "category": "output",
+        "hasInput": true,
+        "hasOutput": false,
+        "color": "#ef4444"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_1",
+      "from": "node_1",
+      "to": "node_2"
+    },
+    {
+      "id": "conn_2",
+      "from": "node_2",
+      "to": "node_3"
+    },
+    {
+      "id": "conn_3",
+      "from": "node_3",
+      "to": "node_4"
+    },
+    {
+      "id": "conn_4",
+      "from": "node_2",
+      "to": "node_5"
+    },
+    {
+      "id": "conn_5",
+      "from": "node_5",
+      "to": "node_6"
+    }
+  ],
+  "settings": {
+    "zoom": 0.9,
+    "pan": {
+      "x": 0,
+      "y": 0
+    },
+    "nodeIdCounter": 6
+  }
+}

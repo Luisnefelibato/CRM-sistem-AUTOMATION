@@ -103,17 +103,35 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 - Google Sheets - Hojas cálculo
 - CRM - Gestión clientes
 
-## 🚧 Funcionalidades No Implementadas
+## ✅ Funcionalidades de Persistencia (NUEVO)
+
+### 💾 Guardado y Carga
+- **Guardar workflows**: Persistencia completa en localStorage
+- **Cargar workflows**: Lista visual con metadata (nodos, conexiones, fecha)
+- **Auto-guardado**: Cada 30 segundos automáticamente
+- **Múltiples workflows**: Gestiona varios proyectos simultáneamente
+- **Shortcut**: `Ctrl+S` para guardar rápidamente
+
+### 📤📥 Exportación e Importación
+- **Exportar a JSON**: Descarga workflows completos
+- **Importar desde JSON**: Carga workflows desde archivos
+- **Workflows de ejemplo**: 2 ejemplos listos para importar
+- **Validación automática**: Verifica estructura al importar
+- **Portabilidad**: Comparte workflows entre usuarios
+
+📚 **Documentación completa**: Ver `EXPORT_IMPORT_GUIDE.md`  
+📁 **Ejemplos**: Ver carpeta `examples/`
+
+## 🚧 Funcionalidades Pendientes
 
 ### Próximas Características
-- **Guardado de flujos**: Persistencia en localStorage/backend
-- **Exportación**: JSON, imagen, código
-- **Plantillas avanzadas**: Más ejemplos predefinidos
-- **Validación de flujos**: Análisis de errores
-- **Logs de ejecución**: Historial y debugging
+- **Ejecución real**: Motor de workflows funcional
+- **Sistema de variables**: `{{node.output.field}}`
+- **Validación avanzada**: Análisis de errores y campos requeridos
+- **Logs de ejecución**: Historial y debugging completo
 - **Autenticación**: Login de usuarios
-- **Colaboración**: Edición compartida
-- **Versionado**: Control de cambios
+- **Colaboración**: Edición compartida en tiempo real
+- **Versionado**: Control de cambios y rollback
 
 ### Integraciones Pendientes
 - **Más APIs**: WhatsApp, Telegram, Discord
