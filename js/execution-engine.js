@@ -202,44 +202,148 @@ class ExecutionEngine {
     }
 
     /**
+     * Resolve variables in text using {{node.output.field}} syntax
+     * @param {string} text - Text with variables to resolve
+     * @param {Object} node - Current node (for context)
+     * @returns {string} Text with resolved variables
+     */
+    resolveVariables(text, node) {
+        if (typeof text !== 'string') return text;
+
+        // Pattern: {{nodeId.field.subfield}} or {{prev.field}}
+        const variablePattern = /\{\{\s*([\w.-]+)\s*\}\}/g;
+        
+        return text.replace(variablePattern, (match, path) => {
+            try {
+                // Handle 'prev' shortcut (last connected node)
+                if (path.startsWith('prev.')) {
+                    const inputs = this.getNodeInputs(node);
+                    const inputNodeIds = Object.keys(inputs);
+                    
+                    if (inputNodeIds.length === 0) {
+                        console.warn(`⚠️ Variable ${match}: No previous nodes connected`);
+                        return match;
+                    }
+                    
+                    // Use the first input node as 'prev'
+                    const prevNodeId = inputNodeIds[0];
+                    const fieldPath = path.substring(5); // Remove 'prev.'
+                    const value = this.getNestedValue(inputs[prevNodeId], fieldPath);
+                    
+                    return value !== undefined ? String(value) : match;
+                }
+                
+                // Handle explicit node references: {{nodeId.field.subfield}}
+                const parts = path.split('.');
+                const nodeId = parts[0];
+                const fieldPath = parts.slice(1).join('.');
+                
+                const nodeData = this.executionContext.get(nodeId);
+                if (!nodeData) {
+                    console.warn(`⚠️ Variable ${match}: Node ${nodeId} not found or not executed yet`);
+                    return match;
+                }
+                
+                const value = this.getNestedValue(nodeData, fieldPath);
+                return value !== undefined ? String(value) : match;
+                
+            } catch (error) {
+                console.error(`Error resolving variable ${match}:`, error);
+                return match;
+            }
+        });
+    }
+
+    /**
+     * Get nested value from object using dot notation
+     * @param {Object} obj - Object to traverse
+     * @param {string} path - Dot-separated path (e.g., 'data.user.name')
+     * @returns {*} Value at path or undefined
+     */
+    getNestedValue(obj, path) {
+        if (!path) return obj;
+        
+        return path.split('.').reduce((current, key) => {
+            return current?.[key];
+        }, obj);
+    }
+
+    /**
+     * Resolve all variables in an object recursively
+     * @param {*} obj - Object/Array/String to resolve
+     * @param {Object} node - Current node
+     * @returns {*} Object with resolved variables
+     */
+    resolveObjectVariables(obj, node) {
+        if (typeof obj === 'string') {
+            return this.resolveVariables(obj, node);
+        }
+        
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.resolveObjectVariables(item, node));
+        }
+        
+        if (obj && typeof obj === 'object') {
+            const resolved = {};
+            for (const [key, value] of Object.entries(obj)) {
+                resolved[key] = this.resolveObjectVariables(value, node);
+            }
+            return resolved;
+        }
+        
+        return obj;
+    }
+
+    /**
      * Execute node-specific logic (simulated for now, to be implemented per node type)
      * @param {Object} node - Node to execute
      * @param {Object} inputs - Input data
      * @returns {Promise<Object>} Output data
      */
     async runNodeLogic(node, inputs) {
+        // Resolve variables in node properties before execution
+        const resolvedProperties = this.resolveObjectVariables(
+            node.properties || {},
+            node
+        );
+        
+        // Create a temporary node object with resolved properties
+        const resolvedNode = {
+            ...node,
+            properties: resolvedProperties
+        };
         // Simulate execution delay
         await this.sleep(300 + Math.random() * 200);
 
-        // Different logic based on node type
-        switch (node.type) {
+        // Different logic based on node type (use resolvedNode for execution)
+        switch (resolvedNode.type) {
             case 'webhook':
-                return this.executeWebhook(node, inputs);
+                return this.executeWebhook(resolvedNode, inputs);
             
             case 'form':
-                return this.executeForm(node, inputs);
+                return this.executeForm(resolvedNode, inputs);
             
             case 'chatgpt':
             case 'gemini':
-                return this.executeAI(node, inputs);
+                return this.executeAI(resolvedNode, inputs);
             
             case 'filter':
-                return this.executeFilter(node, inputs);
+                return this.executeFilter(resolvedNode, inputs);
             
             case 'transform':
-                return this.executeTransform(node, inputs);
+                return this.executeTransform(resolvedNode, inputs);
             
             case 'email-send':
-                return this.executeEmailSend(node, inputs);
+                return this.executeEmailSend(resolvedNode, inputs);
             
             case 'slack':
-                return this.executeSlack(node, inputs);
+                return this.executeSlack(resolvedNode, inputs);
             
             case 'api-call':
-                return this.executeAPICall(node, inputs);
+                return this.executeAPICall(resolvedNode, inputs);
             
             default:
-                return this.executeGeneric(node, inputs);
+                return this.executeGeneric(resolvedNode, inputs);
         }
     }
 
@@ -287,14 +391,18 @@ class ExecutionEngine {
         const inputKeys = Object.keys(inputs);
         const firstInput = inputKeys.length > 0 ? inputs[inputKeys[0]] : {};
         
+        // The systemPrompt has already been resolved with variables
+        const resolvedPrompt = node.properties.systemPrompt || 'Process this data';
+        
         return {
             model: node.properties.model || 'gpt-4',
-            prompt: node.properties.systemPrompt || 'Process this data',
+            prompt: resolvedPrompt,
             input: firstInput,
             response: {
-                text: `Processed by ${node.type}: This is a simulated AI response based on the input data.`,
+                text: `Processed by ${node.type}: AI response based on prompt "${resolvedPrompt.substring(0, 50)}..." and input data.`,
                 confidence: 0.95,
-                tokens: 150
+                tokens: 150,
+                variables_resolved: true
             },
             timestamp: new Date().toISOString()
         };
@@ -344,11 +452,14 @@ class ExecutionEngine {
         const inputKeys = Object.keys(inputs);
         const firstInput = inputKeys.length > 0 ? inputs[inputKeys[0]] : {};
         
+        // Properties are already resolved with variables
         return {
             sent: true,
             provider: node.properties.provider || 'SMTP',
-            to: firstInput.email || 'recipient@example.com',
-            subject: 'Email from Nexus AI Workflow',
+            to: node.properties.to || firstInput.email || 'recipient@example.com',
+            subject: node.properties.subject || 'Email from Nexus AI Workflow',
+            body: node.properties.body || 'Email body content',
+            variables_resolved: true,
             timestamp: new Date().toISOString()
         };
     }
@@ -360,10 +471,12 @@ class ExecutionEngine {
         const inputKeys = Object.keys(inputs);
         const firstInput = inputKeys.length > 0 ? inputs[inputKeys[0]] : {};
         
+        // Properties are already resolved with variables
         return {
             sent: true,
             channel: node.properties.channel || '#general',
-            message: JSON.stringify(firstInput, null, 2),
+            message: node.properties.message || JSON.stringify(firstInput, null, 2),
+            variables_resolved: true,
             timestamp: new Date().toISOString()
         };
     }

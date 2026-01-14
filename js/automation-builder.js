@@ -883,6 +883,44 @@ class AutomationBuilder {
         infoSection.appendChild(infoContainer);
         sections.appendChild(infoSection);
 
+        // Variables help section
+        const variablesSection = document.createElement('div');
+        variablesSection.className = 'property-section variables-help';
+        const variablesTitle = document.createElement('h5');
+        variablesTitle.innerHTML = '<i class="fas fa-code"></i> Variables';
+        
+        const variablesHelp = document.createElement('div');
+        variablesHelp.className = 'variables-help-content';
+        
+        const helpText = document.createElement('p');
+        helpText.textContent = 'Usa variables para referenciar datos de otros nodos:';
+        variablesHelp.appendChild(helpText);
+        
+        const examplesList = document.createElement('ul');
+        examplesList.className = 'variables-examples';
+        
+        const examples = [
+            { code: '{{prev.field}}', desc: 'Dato del nodo anterior' },
+            { code: '{{nodeId.field}}', desc: 'Dato de nodo específico' },
+            { code: '{{prev.data.user.name}}', desc: 'Acceso anidado' }
+        ];
+        
+        examples.forEach(ex => {
+            const li = document.createElement('li');
+            const codeEl = document.createElement('code');
+            codeEl.textContent = ex.code;
+            const descEl = document.createElement('span');
+            descEl.textContent = ` - ${ex.desc}`;
+            li.appendChild(codeEl);
+            li.appendChild(descEl);
+            examplesList.appendChild(li);
+        });
+        
+        variablesHelp.appendChild(examplesList);
+        variablesSection.appendChild(variablesTitle);
+        variablesSection.appendChild(variablesHelp);
+        sections.appendChild(variablesSection);
+
         // Actions section
         const actionsSection = document.createElement('div');
         actionsSection.className = 'property-actions';

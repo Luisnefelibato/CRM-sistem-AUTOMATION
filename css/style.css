@@ -1649,5 +1649,61 @@ body {
         width: 100%;
     }
 }
+
+/* Variables Help Section */
+.variables-help {
+    margin-top: 20px;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+    border: 1px solid var(--nexus-purple);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.variables-help h5 {
+    color: var(--nexus-purple);
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.variables-help-content p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.variables-examples {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.variables-examples li {
+    padding: 8px 12px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.variables-examples code {
+    background: rgba(124, 58, 237, 0.15);
+    color: var(--nexus-purple);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.variables-examples span {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
 .p-2 { padding: 16px; }
 .p-3 { padding: 24px; }

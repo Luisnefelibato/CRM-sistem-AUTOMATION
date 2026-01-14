@@ -66,6 +66,23 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 - **Menú contextual**: Click derecho en nodos
 - **Notificaciones toast**: Feedback visual de acciones
 
+### 🔗 Sistema de Variables (NUEVO)
+- **Sintaxis `{{variable}}`**: Referencia datos de otros nodos
+- **`{{prev.field}}`**: Accede al nodo anterior conectado
+- **`{{nodeId.field}}`**: Accede a nodo específico por ID
+- **Acceso anidado**: `{{prev.data.user.name}}` para objetos profundos
+- **Resolución automática**: Variables se resuelven antes de ejecutar
+- **Flujo de datos real**: Los nodos comparten información entre sí
+- **Documentación completa**: Ver `VARIABLES_GUIDE.md`
+
+**Ejemplo de uso**:
+```javascript
+// En un nodo Email
+to: "{{form_node.fields.email}}"
+subject: "Hola {{form_node.fields.nombre}}"
+body: "Análisis: {{chatgpt_node.response.text}}"
+```
+
 ## 🚦 Rutas Funcionales
 
 ### Página Principal
@@ -130,7 +147,7 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 ### 📤📥 Exportación e Importación
 - **Exportar a JSON**: Descarga workflows completos
 - **Importar desde JSON**: Carga workflows desde archivos
-- **Workflows de ejemplo**: 2 ejemplos listos para importar
+- **Workflows de ejemplo**: 3 ejemplos listos para importar (Lead Qualification, E-commerce, Variables Demo)
 - **Validación automática**: Verifica estructura al importar
 - **Portabilidad**: Comparte workflows entre usuarios
 
