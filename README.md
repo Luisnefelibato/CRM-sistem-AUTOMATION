@@ -66,6 +66,23 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 - **Menú contextual**: Click derecho en nodos
 - **Notificaciones toast**: Feedback visual de acciones
 
+### 🔗 Sistema de Variables (NUEVO)
+- **Sintaxis `{{variable}}`**: Referencia datos de otros nodos
+- **`{{prev.field}}`**: Accede al nodo anterior conectado
+- **`{{nodeId.field}}`**: Accede a nodo específico por ID
+- **Acceso anidado**: `{{prev.data.user.name}}` para objetos profundos
+- **Resolución automática**: Variables se resuelven antes de ejecutar
+- **Flujo de datos real**: Los nodos comparten información entre sí
+- **Documentación completa**: Ver `VARIABLES_GUIDE.md`
+
+**Ejemplo de uso**:
+```javascript
+// En un nodo Email
+to: "{{form_node.fields.email}}"
+subject: "Hola {{form_node.fields.nombre}}"
+body: "Análisis: {{chatgpt_node.response.text}}"
+```
+
 ## 🚦 Rutas Funcionales
 
 ### Página Principal
@@ -118,7 +135,7 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 - Google Sheets - Hojas cálculo
 - CRM - Gestión clientes
 
-## ✅ Funcionalidades de Persistencia (NUEVO)
+### ✅ Funcionalidades de Persistencia
 
 ### 💾 Guardado y Carga
 - **Guardar workflows**: Persistencia completa en localStorage
@@ -130,20 +147,33 @@ Un constructor visual e interactivo de flujos de automatización estilo n8n, des
 ### 📤📥 Exportación e Importación
 - **Exportar a JSON**: Descarga workflows completos
 - **Importar desde JSON**: Carga workflows desde archivos
-- **Workflows de ejemplo**: 2 ejemplos listos para importar
+- **Workflows de ejemplo**: 3 ejemplos listos para importar (Lead Qualification, E-commerce, Variables Demo)
 - **Validación automática**: Verifica estructura al importar
 - **Portabilidad**: Comparte workflows entre usuarios
 
 📚 **Documentación completa**: Ver `EXPORT_IMPORT_GUIDE.md`  
 📁 **Ejemplos**: Ver carpeta `examples/`
 
+### ⚙️ Sistema de Ejecución (NUEVO)
+
+- **Flujo de datos real**: Los nodos pasan datos entre sí
+- **Topological sort**: Ejecución en orden correcto respetando dependencias
+- **Contexto compartido**: Outputs de nodos disponibles para nodos siguientes
+- **Detección de ciclos**: Previene workflows con ciclos infinitos
+- **Estados visuales**: Nodos muestran estado (ejecutando/éxito/error)
+- **Logs estructurados**: Registro completo de ejecución en console
+- **Manejo de errores**: Try/catch y feedback visual de errores
+
+📚 **Documentación completa**: Ver `EXECUTION_ENGINE_GUIDE.md`
+
 ## 🚧 Funcionalidades Pendientes
 
 ### Próximas Características
-- **Ejecución real**: Motor de workflows funcional
-- **Sistema de variables**: `{{node.output.field}}`
+- **Integraciones reales**: Conectar con APIs externas (OpenAI, Slack, etc.)
+- **Sistema de variables**: `{{node.output.field}}` para datos dinámicos
 - **Validación avanzada**: Análisis de errores y campos requeridos
-- **Logs de ejecución**: Historial y debugging completo
+- **Condicionales IF/ELSE**: Rutas alternativas en workflows
+- **Loops**: Iteración sobre arrays de datos
 - **Autenticación**: Login de usuarios
 - **Colaboración**: Edición compartida en tiempo real
 - **Versionado**: Control de cambios y rollback

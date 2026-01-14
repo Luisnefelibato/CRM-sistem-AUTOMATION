@@ -1,0 +1,151 @@
+{
+  "id": "workflow_variables_demo",
+  "name": "Variables Demo - Email Personalizado",
+  "version": "1.0",
+  "description": "Ejemplo completo de uso de variables para flujo de datos entre nodos",
+  "createdAt": "2026-01-14T16:00:00.000Z",
+  "updatedAt": "2026-01-14T16:00:00.000Z",
+  "nodes": [
+    {
+      "id": "form_entrada",
+      "type": "form",
+      "position": { "x": 100, "y": 200 },
+      "properties": {
+        "formName": "Formulario de Contacto",
+        "fields": ["nombre", "email", "empresa", "mensaje"]
+      },
+      "config": {
+        "title": "Formulario",
+        "subtitle": "Datos de entrada",
+        "category": "Entrada",
+        "icon": "fas fa-file-alt",
+        "color": "#3b82f6",
+        "hasInputPort": false,
+        "hasOutputPort": true
+      }
+    },
+    {
+      "id": "chatgpt_analisis",
+      "type": "chatgpt",
+      "position": { "x": 400, "y": 150 },
+      "properties": {
+        "model": "gpt-4",
+        "systemPrompt": "Analiza la consulta de {{prev.fields.nombre}} de la empresa {{prev.fields.empresa}}. Mensaje: {{prev.fields.mensaje}}. Genera un análisis profesional y clasifica la prioridad (Alta/Media/Baja).",
+        "temperature": 0.7
+      },
+      "config": {
+        "title": "ChatGPT",
+        "subtitle": "Análisis de consulta",
+        "category": "Procesamiento",
+        "icon": "fas fa-robot",
+        "color": "#10b981",
+        "hasInputPort": true,
+        "hasOutputPort": true
+      }
+    },
+    {
+      "id": "gemini_traduccion",
+      "type": "gemini",
+      "position": { "x": 400, "y": 300 },
+      "properties": {
+        "model": "gemini-pro",
+        "systemPrompt": "Traduce al inglés el siguiente mensaje: {{prev.fields.mensaje}}"
+      },
+      "config": {
+        "title": "Gemini AI",
+        "subtitle": "Traducción",
+        "category": "Procesamiento",
+        "icon": "fas fa-language",
+        "color": "#8b5cf6",
+        "hasInputPort": true,
+        "hasOutputPort": true
+      }
+    },
+    {
+      "id": "email_respuesta",
+      "type": "email-send",
+      "position": { "x": 700, "y": 200 },
+      "properties": {
+        "provider": "SMTP",
+        "to": "{{form_entrada.fields.email}}",
+        "subject": "Respuesta a tu consulta - {{form_entrada.fields.empresa}}",
+        "body": "Hola {{form_entrada.fields.nombre}},\n\nGracias por contactarnos.\n\nAnálisis:\n{{chatgpt_analisis.response.text}}\n\nTraducción del mensaje:\n{{gemini_traduccion.response.text}}\n\nSaludos,\nEquipo Nexus AI"
+      },
+      "config": {
+        "title": "Enviar Email",
+        "subtitle": "Respuesta automática",
+        "category": "Salida",
+        "icon": "fas fa-envelope",
+        "color": "#f59e0b",
+        "hasInputPort": true,
+        "hasOutputPort": true
+      }
+    },
+    {
+      "id": "slack_notificacion",
+      "type": "slack",
+      "position": { "x": 700, "y": 350 },
+      "properties": {
+        "channel": "#ventas",
+        "message": "🔔 Nueva consulta de {{form_entrada.fields.nombre}} ({{form_entrada.fields.empresa}})\n📧 Email: {{form_entrada.fields.email}}\n🎯 Análisis: {{chatgpt_analisis.response.text}}"
+      },
+      "config": {
+        "title": "Slack",
+        "subtitle": "Notificación interna",
+        "category": "Salida",
+        "icon": "fab fa-slack",
+        "color": "#ec4899",
+        "hasInputPort": true,
+        "hasOutputPort": true
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_1",
+      "from": "form_entrada",
+      "to": "chatgpt_analisis",
+      "fromPort": "output",
+      "toPort": "input"
+    },
+    {
+      "id": "conn_2",
+      "from": "form_entrada",
+      "to": "gemini_traduccion",
+      "fromPort": "output",
+      "toPort": "input"
+    },
+    {
+      "id": "conn_3",
+      "from": "chatgpt_analisis",
+      "to": "email_respuesta",
+      "fromPort": "output",
+      "toPort": "input"
+    },
+    {
+      "id": "conn_4",
+      "from": "gemini_traduccion",
+      "to": "email_respuesta",
+      "fromPort": "output",
+      "toPort": "input"
+    },
+    {
+      "id": "conn_5",
+      "from": "chatgpt_analisis",
+      "to": "slack_notificacion",
+      "fromPort": "output",
+      "toPort": "input"
+    }
+  ],
+  "settings": {
+    "autoSave": true,
+    "zoom": 1,
+    "theme": "dark"
+  },
+  "metadata": {
+    "tags": ["variables", "demo", "email", "ai"],
+    "author": "Nexus AI",
+    "nodeCount": 5,
+    "connectionCount": 5
+  }
+}

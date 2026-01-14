@@ -79,6 +79,54 @@ Stripe Webhook → Transform → Firebase
 
 ---
 
+### 3. 🔗 Demo de Variables - Email Personalizado
+**Archivo**: `variables-demo.json`
+
+**Descripción**: Ejemplo completo que demuestra el **sistema de variables** para flujo de datos entre nodos.
+
+**Flujo**:
+```
+Formulario → ChatGPT (Análisis)  ↘
+          ↘ Gemini (Traducción)  → Email Personalizado
+                                 → Slack Notificación
+```
+
+**Nodos**: 5  
+**Conexiones**: 5  
+**Categorías**: Input, Processing, Output  
+
+**Características**:
+- ✅ **Variables `{{prev.field}}`**: Referencia al nodo anterior
+- ✅ **Variables `{{nodeId.field}}`**: Referencia a nodo específico
+- ✅ **Acceso anidado**: `{{prev.fields.nombre}}`
+- ✅ **Multi-fuente**: Combina datos de ChatGPT + Gemini
+- ✅ **Email personalizado** con datos del formulario
+- ✅ **Notificación enriquecida** con análisis de IA
+
+**Ejemplos de variables usadas**:
+```javascript
+// En ChatGPT
+"Analiza la consulta de {{prev.fields.nombre}} de {{prev.fields.empresa}}"
+
+// En Email
+"to": "{{form_entrada.fields.email}}"
+"subject": "Respuesta a tu consulta - {{form_entrada.fields.empresa}}"
+"body": "{{chatgpt_analisis.response.text}}\n{{gemini_traduccion.response.text}}"
+
+// En Slack
+"message": "Nueva consulta de {{form_entrada.fields.nombre}} - {{chatgpt_analisis.response.text}}"
+```
+
+**Ideal para**:
+- 📚 Aprender el sistema de variables
+- 🎓 Entender flujo de datos entre nodos
+- 🔧 Template para workflows con variables
+- 💡 Ver patrones avanzados de referencia
+
+**Documentación**: Ver `../VARIABLES_GUIDE.md` para guía completa
+
+---
+
 ## 🔧 Configuración Requerida
 
 ### Variables de Entorno
@@ -197,5 +245,5 @@ Workflows planeados para agregar:
 Abre un issue en GitHub o consulta la documentación completa.
 
 **Última actualización**: 2026-01-14  
-**Workflows incluidos**: 2  
+**Workflows incluidos**: 3 (Lead Qualification, E-commerce Notifications, Variables Demo)  
 **Más ejemplos**: Próximamente
