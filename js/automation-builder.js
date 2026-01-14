@@ -27,6 +27,9 @@ class AutomationBuilder {
         this.flowStatusEl = document.getElementById('flowStatus');
         this.toastContainer = document.getElementById('toastContainer');
         
+        // Initialize persistence manager
+        this.persistence = new PersistenceManager(this);
+        
         // Initialize the builder
         this.init();
     }
@@ -36,7 +39,12 @@ class AutomationBuilder {
         this.setupEventListeners();
         this.setupDragAndDrop();
         this.setupCanvas();
+        this.setupPersistenceUI();
         this.updateStats();
+        
+        // Start auto-save
+        this.persistence.startAutoSave();
+        
         this.showToast('¡Bienvenido a Nexus AI!', 'success');
         console.log('✅ Automation Builder inicializado correctamente');
     }
@@ -69,6 +77,10 @@ class AutomationBuilder {
 
     setupEventListeners() {
         // Header buttons
+        document.getElementById('saveWorkflow')?.addEventListener('click', () => this.showSaveModal());
+        document.getElementById('loadWorkflow')?.addEventListener('click', () => this.showLoadModal());
+        document.getElementById('exportWorkflow')?.addEventListener('click', () => this.exportWorkflow());
+        document.getElementById('importWorkflow')?.addEventListener('click', () => this.importWorkflow());
         document.getElementById('loadExampleFlow')?.addEventListener('click', () => this.showExamples());
         document.getElementById('clearCanvas')?.addEventListener('click', () => this.clearCanvas());
         
@@ -252,6 +264,9 @@ class AutomationBuilder {
         this.updateStats();
         this.updateDropZoneHint();
         this.showToast(`Nodo "${nodeData.title}" añadido`, 'success');
+        
+        // Mark as changed for auto-save
+        this.markAsChanged();
         
         // Auto-select new node
         this.selectNode(nodeElement);
@@ -1096,6 +1111,9 @@ class AutomationBuilder {
         this.drawConnection(connectionId);
         this.updateStats();
         
+        // Mark as changed for auto-save
+        this.markAsChanged();
+        
         this.showToast('Conexión creada exitosamente', 'success');
         console.log(`✨ Conexión creada: ${fromNodeId}.${fromPort} → ${toNodeId}.${toPort}`);
     }
@@ -1190,6 +1208,10 @@ class AutomationBuilder {
         if (path) path.remove();
         
         this.updateStats();
+        
+        // Mark as changed for auto-save
+        this.markAsChanged();
+        
         this.showToast('Conexión eliminada', 'info');
         console.log(`🗑️ Conexión eliminada: ${connectionId}`);
     }
@@ -1219,6 +1241,10 @@ class AutomationBuilder {
         
         this.updateStats();
         this.updateDropZoneHint();
+        
+        // Mark as changed for auto-save
+        this.markAsChanged();
+        
         this.showToast('Nodo eliminado', 'info');
         console.log(`🗑️ Nodo eliminado: ${nodeId}`);
     }
@@ -1689,6 +1715,266 @@ class AutomationBuilder {
         setTimeout(() => {
             document.addEventListener('click', () => menu.remove(), { once: true });
         }, 100);
+    }
+
+    /**
+     * Setup Persistence UI - Event listeners for save/load modals
+     */
+    setupPersistenceUI() {
+        // Save Modal
+        document.getElementById('confirmSave')?.addEventListener('click', () => this.saveWorkflow());
+        document.getElementById('cancelSave')?.addEventListener('click', () => this.hideSaveModal());
+        document.getElementById('closeSaveModal')?.addEventListener('click', () => this.hideSaveModal());
+        
+        // Load Modal
+        document.getElementById('closeLoadModal')?.addEventListener('click', () => this.hideLoadModal());
+        document.getElementById('loadModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'loadModal') this.hideLoadModal();
+        });
+        
+        // Save Modal overlay click
+        document.getElementById('saveModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'saveModal') this.hideSaveModal();
+        });
+        
+        // Import file input
+        document.getElementById('importFileInput')?.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.handleImportFile(file);
+            }
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+S / Cmd+S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                this.showSaveModal();
+            }
+        });
+    }
+
+    /**
+     * Show Save Modal
+     */
+    showSaveModal() {
+        if (this.nodes.size === 0) {
+            this.showToast('No hay nodos para guardar', 'warning');
+            return;
+        }
+        
+        const modal = document.getElementById('saveModal');
+        const input = document.getElementById('workflowName');
+        
+        // Set current workflow name if exists
+        const currentName = this.persistence.getCurrentWorkflowName();
+        if (currentName) {
+            input.value = currentName;
+        } else {
+            input.value = '';
+        }
+        
+        modal.classList.add('active');
+        setTimeout(() => input.focus(), 100);
+    }
+
+    /**
+     * Hide Save Modal
+     */
+    hideSaveModal() {
+        document.getElementById('saveModal').classList.remove('active');
+    }
+
+    /**
+     * Save Workflow
+     */
+    saveWorkflow() {
+        const input = document.getElementById('workflowName');
+        const name = input.value.trim();
+        
+        if (!name) {
+            this.showToast('Ingresa un nombre para el workflow', 'warning');
+            input.focus();
+            return;
+        }
+        
+        const result = this.persistence.saveWorkflow(name);
+        
+        if (result.success) {
+            this.showToast(`Workflow "${result.name}" guardado exitosamente`, 'success');
+            this.hideSaveModal();
+        } else {
+            this.showToast(`Error al guardar: ${result.error}`, 'error');
+        }
+    }
+
+    /**
+     * Show Load Modal with workflows list
+     */
+    showLoadModal() {
+        const modal = document.getElementById('loadModal');
+        const workflows = this.persistence.getAllWorkflows();
+        const workflowsList = document.getElementById('workflowsList');
+        
+        // Clear current list
+        workflowsList.innerHTML = '';
+        
+        const workflowsArray = Object.values(workflows);
+        
+        if (workflowsArray.length === 0) {
+            workflowsList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <p>No hay workflows guardados</p>
+                    <small>Crea y guarda tu primer workflow</small>
+                </div>
+            `;
+        } else {
+            // Sort by updated date (most recent first)
+            workflowsArray.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            
+            workflowsArray.forEach(workflow => {
+                const item = document.createElement('div');
+                item.className = 'workflow-item';
+                if (workflow.id === this.persistence.getCurrentWorkflowId()) {
+                    item.classList.add('active');
+                }
+                
+                const date = new Date(workflow.updatedAt);
+                const formattedDate = date.toLocaleDateString('es-ES', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                item.innerHTML = `
+                    <div class="workflow-info">
+                        <h4>${this.sanitizeText(workflow.name)}</h4>
+                        <div class="workflow-meta">
+                            <span><i class="fas fa-project-diagram"></i> ${workflow.nodes.length} nodos</span>
+                            <span><i class="fas fa-link"></i> ${workflow.connections.length} conexiones</span>
+                            <span><i class="fas fa-clock"></i> ${formattedDate}</span>
+                        </div>
+                    </div>
+                    <div class="workflow-actions">
+                        <button class="workflow-action-btn load" data-workflow-id="${workflow.id}" title="Cargar">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                        <button class="workflow-action-btn delete" data-workflow-id="${workflow.id}" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Load workflow on click
+                item.querySelector('.load').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.loadWorkflowById(workflow.id);
+                });
+                
+                // Delete workflow
+                item.querySelector('.delete').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.deleteWorkflowById(workflow.id, workflow.name);
+                });
+                
+                // Also load on item click
+                item.addEventListener('click', () => {
+                    this.loadWorkflowById(workflow.id);
+                });
+                
+                workflowsList.appendChild(item);
+            });
+        }
+        
+        modal.classList.add('active');
+    }
+
+    /**
+     * Hide Load Modal
+     */
+    hideLoadModal() {
+        document.getElementById('loadModal').classList.remove('active');
+    }
+
+    /**
+     * Load workflow by ID
+     * @param {string} workflowId - Workflow ID to load
+     */
+    loadWorkflowById(workflowId) {
+        const result = this.persistence.loadWorkflow(workflowId);
+        
+        if (result.success) {
+            this.showToast(`Workflow "${result.name}" cargado exitosamente`, 'success');
+            this.hideLoadModal();
+        } else {
+            this.showToast(`Error al cargar: ${result.error}`, 'error');
+        }
+    }
+
+    /**
+     * Delete workflow by ID
+     * @param {string} workflowId - Workflow ID to delete
+     * @param {string} workflowName - Workflow name
+     */
+    deleteWorkflowById(workflowId, workflowName) {
+        if (!confirm(`¿Estás seguro de eliminar "${workflowName}"?`)) {
+            return;
+        }
+        
+        const result = this.persistence.deleteWorkflow(workflowId);
+        
+        if (result.success) {
+            this.showToast(`Workflow "${result.name}" eliminado`, 'info');
+            // Refresh the list
+            this.showLoadModal();
+        } else {
+            this.showToast(`Error al eliminar: ${result.error}`, 'error');
+        }
+    }
+
+    /**
+     * Export workflow to JSON file
+     */
+    exportWorkflow() {
+        if (this.nodes.size === 0) {
+            this.showToast('No hay nodos para exportar', 'warning');
+            return;
+        }
+        
+        this.persistence.exportToFile();
+    }
+
+    /**
+     * Import workflow from JSON file
+     */
+    importWorkflow() {
+        const input = document.getElementById('importFileInput');
+        input.click();
+    }
+
+    /**
+     * Handle import file
+     * @param {File} file - File to import
+     */
+    async handleImportFile(file) {
+        try {
+            await this.persistence.importFromFile(file);
+            // Reset file input
+            document.getElementById('importFileInput').value = '';
+        } catch (error) {
+            console.error('Error importing file:', error);
+        }
+    }
+
+    /**
+     * Mark workflow as changed (for auto-save)
+     */
+    markAsChanged() {
+        this.persistence.markAsChanged();
     }
 }
 
